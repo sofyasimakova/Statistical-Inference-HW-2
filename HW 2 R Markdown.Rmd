@@ -28,13 +28,16 @@ $$\frac{X}{\theta}= \frac{ n-X}{1-\theta}$$
 $${X}-{X} \theta= n \theta -{X} \theta$$
 $${X}=\theta n$$
 $$\boxed{\hat{\theta}^{ML}=\frac{X}{n}}$$
+To check if this value is indeed maximum, we should consider the second derivative of the log-likelihood function.
+$$\frac{\partial^2 \ell \left(\theta, X\right)}{\partial \theta^2} = - \frac{X}{\theta^2} - \frac{n-X}{\left(1-\theta\right)^2} < 0$$
+Also, we should demonstrate that the optimum is not at the boundaries of the interval for $\theta$ -- $[0, 1]$. Since $\ell \left(\theta, X\right)$ depends on $\log \theta$ and $\log (1 - \theta)$, the value of the log-likelihood function when $\theta$ is either $0$ or $1$ is $-\infty$. Therefore, we can conclude that $\hat{\theta}^{ML}$ is a Maximum Likelihood Estimator.
 $$\mathbb E \; \hat{\theta}^{ML}= \mathbb E \left[\frac{X}{n}\right] =\frac{1}{n} \mathbb EX =\frac{1}{n} n \theta = \theta$$
 From the fact that the mean of a binomial distribution is $n\theta$ and its variance is $n\theta(1-\theta)$ we have:
 $$Var\:\hat{\theta}^{ML}= Var\left[\frac{X}{n}\right]=\frac{1}{n^2} Var X =\frac{1}{n^2} n\theta(1-\theta)=\frac{\theta(1-\theta)}{n}$$
 
 ## b.
 $$\hat{\theta}^{alt.}=\frac{(X+1)}{(n+2)}$$
-$$\mathbb E \:\hat{\theta}^{alt.} = \mathbb E\left[\frac{X+1}{n+2}\right] = \frac{1}{n+2} E[X+1]=\frac{1}{n+2}[n \theta+1]=\frac{n \theta+1}{n+2}$$
+$$\mathbb E \:\hat{\theta}^{alt.} = \mathbb E\left[\frac{X+1}{n+2}\right] = \frac{1}{n+2} \mathbb E[X+1]=\frac{1}{n+2}[n \theta+1]=\frac{n \theta+1}{n+2}$$
 $$Var\:\hat{\theta}^{alt.}=Var\left[\frac{X+1}{n+2}\right]=\frac{1}{(n+2)^{2}} \operatorname{Var}[X+1]=\frac{\operatorname{Var}[X]}{(n+2)^{2}}=\frac{n \theta(1-\theta)}{(n+2)^{2}}$$
 
 ## c.
