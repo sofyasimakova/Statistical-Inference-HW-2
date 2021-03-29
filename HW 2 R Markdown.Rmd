@@ -102,7 +102,35 @@ legend("topleft", legend = c("MLE", "alternative"),
        col = c("red", "blue"), lty = 1, cex = 1)
 ```
 
-# 4 Data analysis (5pts).
+# 2 Robustness of the estimators
+## Part a
+The maximum likelihood function for a Gaussian model whose variance is 1 is given below.
+$$\mathcal {L}_n(\theta,X_1, \ldots, X_n) = \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi}} e^{-\frac{1}{2} (X_i -\theta)^{2}}$$
+To compute the Maximum Likelihood estimator $\hat{\theta}^{ML}$, we find the zero of the first derivative of the log-likelihood function.
+\begin{align*}
+\ell_n (\theta,X_1, \ldots , X_n) &= \log \mathcal {L}_n(\theta,X_1, \ldots, X_n)= \log \left(\prod_{i=1}^{n} \frac{1}{\sqrt{2\pi}}e^{-\frac{1}{2} (X_i -\theta)^{2}} \right)\\
+&= \sum_{i=1}^{n}\log \left(\frac{1}{\sqrt{2\pi}}e^{-\frac{1}{2} (X_i -\theta)^{2}} \right) = \sum_{i=1}^{n} \left(\log \frac{1}{\sqrt{2\pi}} + \log  e^{-\frac{1}{2} (X_i -\theta)^{2}} \right)\\
+&= \sum_{i=1}^{n} \left(\log \frac{1}{\sqrt{2\pi}} -\frac{1}{2} (X_i -\theta)^{2} \right) = n \log \frac{1}{\sqrt{2\pi}} -\frac{1}{2} \sum_{i=1}^{n} \left(X_i -\theta \right)^{2}
+\end{align*}
+$$\frac{\partial \ell_n (\theta,X_1, \ldots , X_n)}{\partial \theta} = -\frac{1}{2} \sum_{i=1}^{n} 2(X_i - \theta) (-1) = 0$$
+$$\frac{\partial \ell_n (\theta,X_1, \ldots , X_n)}{\partial \theta} = \sum_{i=1}^{n} (X_i - \theta) = 0$$
+$$\sum_{i=1}^{n}(X_i - \theta) = 0$$
+$$\sum_{i=1}^{n} X_i - \sum_{i=1}^{n} \theta = 0$$
+$$n\theta= \sum_{i=1}^{n} X_i$$
+$$\boxed{\hat{\theta}^{ML} = \bar{X}_n}$$
+To prove that this estimator is indeed maximum, we will demonstrate that the second derivative is negative.
+$$\frac{\partial^2 \ell_n (\theta,X_1, \ldots , X_n)}{\partial \theta^2} = \sum_{i=1}^{n} (- 1) = -n < 0$$
+Using this $\hat{\theta}^{ML}$, we find the estimator $\hat{Q}^{ML}$ of the underlying distribution. In other words, we will simply use the MLE instead of $\theta$ in the given formula: $\hat{Q}^{ML} = \mathcal{N}(\hat \theta^{ML}, 1) = \mathcal{N}(\bar X_n, 1)$.
+
+## Part b
+In practice, it is possible that $Q$ is not in the proposed model. For example, analysts used a normal distribution to model stock returns for decades. However, financial crises showed that actual stock returns are negatively skewed (more negative shocks than positive shocks) and have fat tails. A similar situation might be true with $Q$. We might believe that the underlying distribution is normal; however, the skewness and kurtosis of the distribution can be very different from a Gaussian model's respective moments. 
+
+If this is the case, $\hat{Q}^{ML}$ might be a biased estimator of $Q$. In the class, we saw that MLE can produce very different results when one assumes that a Laplace distribution generated the underlying data instead of a normal distribution. Similarly, if the underlying distribution is not normal, $\hat{Q}^{ML}$, which is based on $\hat{\theta}^{ML}$, can produce very unreliable results.
+
+## Part c
+
+
+# 4 Data analysis
 ## Part a
 ```{r, message=FALSE}
 rm(list = ls())
@@ -131,7 +159,7 @@ From the graph, it is clear that the distribution of weights does not follow a G
 
 Therefore, a Gaussian model does not seem appropriate for the above distribution. 
 
-# d.
+# Part d
 We will use $\bar X_n$ for the empirical mean and $\hat \sigma$ for the empirical variance, both of which are MLE for a normal distribution. From the Central Limit Theorem, we know the following:
 $$\frac {\sqrt{n} \left(\bar X_n - \mu\right)}{\sigma} \xrightarrow{D} \mathcal{N}(0, 1)$$
 In addition, a normal distribution satisfies the regularity conditions covered in the class. Therefore, the MLE estimator of the population variance, $\hat \sigma$, is consistent estimator of $\sigma$. Said otherwise, $\hat \sigma \xrightarrow{P} \sigma$. Using the Continuous Map Theorem several times as well as the Slutsky's Theorem, we will arrive at the following result.
