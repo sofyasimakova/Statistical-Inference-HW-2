@@ -1,5 +1,5 @@
 ---
-title: "Homework 2"
+title: "Statistical Inference: Homework 2"
 author: "Asrorbek Orzikulov, Sofya Simakova"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output: pdf_document
@@ -10,7 +10,7 @@ library(tidyverse)
 knitr::opts_chunk$set(fig.align = 'center', echo = TRUE)
 ```
 
-# 1 Comparison of estimators (5pts)
+# 1 Comparison of estimators
 
 ## Part a
 We will first write a likelihood function for $X \sim {Bin}(n, \theta)$.
@@ -76,24 +76,18 @@ theta_mle <- X / n
 bias_mle <- 0
 var_mle <- theta * (1-theta) / n
 mse_mle <- bias_mle^2 + var_mle
+print(c("theta_mle" = theta_mle, "bias_mle" = bias_mle, 
+        "var_mle" = var_mle, "mse_mle" = mse_mle))
 
 theta_alt <- (X+1) / (n+2)
 bias_alt <- (1 - 2*theta) / (n+2)
 var_alt <- (n*theta*(1-theta)) / (n+2)^2
 mse_alt <- bias_alt^2 + var_alt
-
-paste("theta_mle is", theta_mle)
-paste("bias_mle is", bias_mle)
-paste("var_mle is", var_mle)
-paste("mse_mle is", mse_mle)
-
-paste("theta_alt is", theta_alt)
-paste("bias_alt is", bias_alt)
-paste("var_alt is", var_alt)
-paste("mse_alt is", mse_alt)
+print(c("theta_alt" = theta_alt, "bias_alt" = bias_alt, 
+        "var_alt" = var_alt, "mse_alt" = mse_alt))
 ```
 
-For this question, we will use $n = 50$ and show the MSE of $\hat \theta^{MLE}$ and $\hat \theta^{alt.}$ as a function of $\theta \in [0, 1]$.
+For this question, we will use $n = 50$ and show the MSE of $\hat \theta^{MLE}$ and $\hat \theta^{alt}$ as a function of $\theta \in [0, 1]$.
 ```{r}
 thetas <- seq(0, 1, by = 0.005)
 mse_mle <- c()
@@ -102,67 +96,54 @@ for (theta in thetas) {
   mse_mle <- c(mse_mle, theta * (1-theta) / n)
   mse_alt <- c(mse_alt, (1 + (n-4)*theta - (n-4)*theta^2) / (n+2)^2)
 }
-
 plot(thetas, mse_mle, type = 'l', col = 'red', lwd = 2, ylab = "MSE")
 points(thetas, mse_alt, type = 'l', col = 'blue', lwd = 2, ylab = "MSE")
-
 legend("topleft", legend = c("MLE", "alternative"),
        col = c("red", "blue"), lty = 1, cex = 1)
 ```
 
 # 4 Data analysis (5pts).
 ## Part a
-```{r}
+```{r, message=FALSE}
+rm(list = ls())
 mydata <- read_csv("poulpeF.csv")
 summary(mydata)
 ```
 We see from looking at the summary that the lowest octopus weight represented is 40 and the highest is 2400. The median (545) is lower than the mean (639), suggesting that the distribution of weights is right-skewed. 
 
 ## Part b
-We saw in class that the MLE of the mean and variance of a normal distribution are the empirical mean and empirical variance of data. In R, these can be conveniently calculated using `mean` and `var` functions. Since the formula for the built-in `var` function uses $n-1$ in its denominator, we will just scale it appropriately.
+We saw in the class that the MLE of the mean and variance of a normal distribution are the empirical mean and empirical variance of data. In R, these can be conveniently calculated using `mean` and `var` functions. Since the formula for the built-in `var` function uses $n-1$ in its denominator, we will just scale it appropriately.
 ```{r}
-sum <- 0
-n <-0
-for (x in mydata$Poids){
-  sum <- sum + x
-  n <- n+1
-}
-mle_mean = sum/n
-paste("MLE of the mean is ", mle_mean)
-paste("MLE of the mean is ", mean(mydata$Poids))
+n <- length(mydata$Poids)
+mle_mean <- mean(mydata$Poids)
+mle_var <- var(mydata$Poids) * (n-1)/n
+print(c("MLE of the mean" = mle_mean, "     MLE of the variance" = mle_var))
 ```
 
+## Part c
 ```{r}
-sum <- 0
-n <- 0
-mean <- mle_mean
-
-for (x in mydata$Poids){
-  diff_squared <- (x - mean)^2
-  sum <- sum + diff_squared
-  n <- n+1
-}
-mle_var <- sum / n
-paste("MLE of the variance is ", mle_var)
-paste("MLE of the variance is ", var(mydata$Poids) * (n-1)/n)
+hist(mydata$Poids, main = "Distribution of Data", xlab = "Weigths")
 ```
+From the graph, it is clear that the distribution of weights does not follow a Gaussian model. Using a Gaussian model for hypothesis testing or interval estimation would be a problem because of two reasons:
 
-## c.
-```{r}
-hist(mydata$Poids)
-```
+  1. The distribution is heavily skewed to the right.
+  2. The distribution is bounded below by zero, and the proportion of observations in the leftmost bin is not small.
 
-From the graph it is clear that the distribution of weights does not follow the Gaussian model.
-Is skewes heavily to the right. Using Gaussian model for calculations would be a problem, 
-as it would not provide accurate results.
+Therefore, a Gaussian model does not seem appropriate for the above distribution. 
 
 # d.
+We will use $\bar X_n$ for the empirical mean and $\hat \sigma$ for the empirical variance, both of which are MLE for a normal distribution. From the Central Limit Theorem, we know the following:
+$$\frac {\sqrt{n} \left(\bar X_n - \mu\right)}{\sigma} \xrightarrow{D} \mathcal{N}(0, 1)$$
+In addition, a normal distribution satisfies the regularity conditions covered in the class. Therefore, the MLE estimator of the population variance, $\hat \sigma$, is consistent estimator of $\sigma$. Said otherwise, $\hat \sigma \xrightarrow{P} \sigma$. Using the Continuous Map Theorem several times as well as the Slutsky's Theorem, we will arrive at the following result.
+$$\frac {\sqrt{n} \left(\bar X_n - \mu\right)}{\sigma} \frac{\sigma}{\hat \sigma} \xrightarrow{D} \mathcal{N}(0, 1) \times 1$$
+$$\frac {\sqrt{n} \left(\bar X_n - \mu\right)}{\hat \sigma} \xrightarrow{D} \mathcal{N}(0, 1)$$
+Putting it all together, we will arrive at a confidence interval for $\mu$:
+$$\bar X_n \pm z_{1 - \alpha / 2} \times \frac{\hat \sigma}{\sqrt{n}}$$
 ```{r}
-variance <- mle_var # we can say that because this is a Gaussian distribution
-lower <- mean - 1.95 * sqrt(variance) / sqrt(n)
-paste("Lower bound of the confidence interval is ", lower)
-```
-```{r}
-upper <- mean + 1.95 * sqrt(variance) / sqrt(n)
-paste("Upper bound of the confidence interval is ", upper)
+alpha <- 0.05
+z_score <- qnorm(1 - alpha/2, 0, 1, TRUE)
+lower <- mle_mean - z_score * sqrt(mle_var) / sqrt(n)
+upper <- mle_mean + z_score * sqrt(mle_var) / sqrt(n)
+paste("Lower bound of the confidence interval is", lower)
+paste("Upper bound of the confidence interval is", upper)
 ```
