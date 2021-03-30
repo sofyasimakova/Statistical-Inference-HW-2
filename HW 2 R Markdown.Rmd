@@ -11,7 +11,6 @@ knitr::opts_chunk$set(fig.align = 'center', echo = TRUE)
 ```
 
 # 1 Comparison of estimators
-
 ## Part a
 We will first write a likelihood function for $X \sim {Bin}(n, \theta)$.
 $$\mathcal{L} \left(\theta, X\right)= P_{X}\left(x\right)=\left(\begin{array}{c}
